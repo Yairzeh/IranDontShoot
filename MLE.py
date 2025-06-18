@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import minimize
 
 # Setting the true values of the normal distribution.
 MEAN = 5
 STANDARD_DEVIATION = 2
+X_AXIS_SIZE = 500
 
 # Creating the sample sizes and empty lists that will contain the estimated results.
 sample_sizes = [5, 10, 20, 50, 100, 500, 1000]
@@ -35,5 +35,38 @@ plt.axhline(STANDARD_DEVIATION, color='r', label='Real Standard Deviation')
 plt.title("Standard Deviation Estimate by Sample Size")
 plt.xlabel("Sample Size")
 plt.ylabel("Standard Deviation Estimate")
+plt.legend()
+plt.show()
+
+
+# Creating a gaussian graph
+def normal_probability_density(x_axis, mean, standard_deviation):
+    """
+    Returns the values resulting from the probability density function for given x_axis, mean and standard deviation.
+    """
+    return (1 / (np.sqrt(2 * np.pi * standard_deviation ** 2))) * np.exp(
+        -((x_values - mean) ** 2) / (2 * standard_deviation ** 2))
+
+
+# creating the x-axis's values.
+x_values = np.linspace(0, 10, X_AXIS_SIZE)
+# probability density of the real normal distribution.
+real_probability_density = normal_probability_density(x_values, MEAN, STANDARD_DEVIATION)
+
+# setting the graph size to be bigger and adding the real gaussian for reference.
+plt.figure(figsize=(10, 6), dpi=100)
+plt.plot(x_values, real_probability_density, 'k--', label='Real Normal', linewidth=5)
+
+# for each sample size, create a plot of normal distribution graph.
+for index in range(len(sample_sizes)):
+    plt.plot(
+        x_values,
+        normal_probability_density(x_values, estimated_means_list[index], estimated_standard_deviations_list[index]),
+        label=f'Gaussian for Sample Size: {sample_sizes[index]}'
+    )
+
+plt.title("MLE probability density function for different sample sizes")
+plt.xlabel("X value")
+plt.ylabel("Probability Density")
 plt.legend()
 plt.show()
