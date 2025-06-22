@@ -15,7 +15,7 @@ class Account:
     and loading the account from the config file.
     """
 
-    def __init__(self, account_number, password, balance):
+    def __init__(self, account_number, password, balance=0):
         self.account_number = account_number
         self.__password = password
         self.__balance = balance
@@ -108,6 +108,7 @@ def get_startup_method():
     return {
         '1': start_action_loop,
         '2': lambda *_: exit_program(),
+        '3': create_account,
     }
 
 
@@ -132,6 +133,7 @@ def get_startup_choice():
     return input('\nWelcome! Here are your options:\n\n'
                  '[1] Log-in\n'
                  '[2] Exit out of program\n'
+                 '[3] Create a new account\n'
                  'Enter your choice: ')
 
 
@@ -181,6 +183,20 @@ def exit_program():
     """
     print('\nExiting program...')
     exit()
+
+
+def create_account(cls, file_path):
+    """
+    Gets account number and password from user, and creates a new account, unless:
+    - account number already in config, then raises a ValueError correspondingly.
+    """
+    account_number = input('\nEnter new account number: ')
+    if load_json_file(file_path).get(account_number) is None:
+        account_password = input('\nEnter new account password: ')
+        cls(account_number, account_password).save_account_to_config(file_path)
+        print('\nAccount created!')
+    print('\nAccount already exists!')
+    raise ValueError
 
 
 def start_program_loop(cls, file_path):
