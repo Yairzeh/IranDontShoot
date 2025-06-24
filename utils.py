@@ -17,10 +17,14 @@ def dump_to_json(file_path, data, indent=2):
         json.dump(data, file, indent=indent)
 
 
-def load_and_dump_to_json(file_path, key, value, indent=2):
+def insert_value_into_json_file(file_path, key, value, indent=2):
     """
-    loads the config file, and dumps the key:value pair into it.
+    loads a json file, and dumps a key:value pair into it.
     """
     file = load_json_file(file_path)
     file[key] = value
     dump_to_json(file_path, file, indent)
+
+def exit_program():
+    print('\nExiting program...')
+    exit()
