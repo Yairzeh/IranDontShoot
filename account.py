@@ -1,14 +1,16 @@
 class Account:
     """
     class for a bank account that has an account number, password and balance, and has methods that:
-    return the password, prints the balance, withdraws and deposits from balance, change the password, get teh account's
-    data and a method dictionary that contains the methods used by the main program.
+    print the balance, withdraw and deposit from balance, change the password 
+    and a method factory that contains the user's actions.
     """
 
     def __init__(self, account_number, password, balance=0):
         self.account_number = account_number
-        self.__password = password
-        self.__balance = balance
+        self.password = password
+        self.balance = balance
+        self.withdraw = 'withdrawal'
+        self.deposit = 'deposit'
 
     def __eq__(self, other):
         return self.account_number == other.account_number
@@ -16,70 +18,47 @@ class Account:
     def __hash__(self):
         return hash(self.account_number)
 
-    def get_password(self):
-        return self.__password
-
     def print_balance(self):
-        print(f'\nYour balance is: {self.__balance}')
+        print(f'\nYour balance is: {self.balance}')
 
-    def withdraw(self):
+    def withdraw_or_deposit(self, action):
         """
-        asks for withdrawal amount, checks that it's not negative, is a number and not bigger then the account's balance,
+        checks that action is either deposit or withdraw, then that the inputted amount is positive and a number, 
+        if it's a deposit, adds it to balance. if it's a withdrawal, checks that the amount is smaller the balance,
         then subtracts it from the balance.
         """
-        try:
-            withdrawal_amount = float(input('\nEnter Withdrawal amount: '))
-        except ValueError:
-            raise ValueError('Input must be a number!')
-        if withdrawal_amount > self.__balance:
-            print('Not enough balance!')
-            raise ValueError
-        if withdrawal_amount < 0:
-            print('Withdrawal amount must be positive!')
-            raise ValueError
-        self.__balance -= withdrawal_amount
-
-    def deposit(self):
-        """
-        asks for deposit amount, checks that it's not negative and is a number, then adds it to the account's balance.
-        """
-        try:
-            deposit_amount = float(input('\nEnter deposit amount: '))
-        except ValueError:
-            print('Input must be a number!')
-            raise ValueError
-        if deposit_amount < 0:
-            print('Deposit amount must be positive!')
-            raise ValueError
-        self.__balance += deposit_amount
+        if action in [self.withdraw, self.deposit]:
+            try:
+                amount = float(input(f'\nEnter {action} amount: '))
+            except ValueError:
+                raise ValueError('\nInput must be a number!')
+            if amount < 0:
+                raise ValueError(f'\n{action} amount must be positive!')
+            if action == self.withdraw:
+                if amount > self.balance:
+                    raise ValueError('\nNot enough balance!')
+                self.balance -= amount
+            if action == self.deposit:
+                self.balance += amount
+            return
+        raise ValueError('Invalid action!')
 
     def change_password(self):
         """
         asks for a new password, checks that it's not the same as the old password, and changes it.
         """
         new_password = input('\nEnter New Password: ')
-        if new_password == self.__password:
+        if new_password == self.password:
             print('\nPassword is the same!')
         else:
-            self.__password = new_password
+            self.password = new_password
             print('\nPassword changed successfully!')
 
-    def get_account_data(self):
-        account_values = {
-            'password': self.__password,
-            'balance': self.__balance
-        }
-        return self.account_number, account_values
-
-    def get_action_method(self, user_accounts, file_path):
-        """
-        dictionary containing the methods performed by the main program's action menu
-        """
-        from useraccounts import UserAccounts
+    @property
+    def get_user_actions(self):
         return {
             '1': self.print_balance,
-            '2': self.withdraw,
-            '3': self.deposit,
+            '2': lambda: self.withdraw_or_deposit(self.withdraw),
+            '3': lambda: self.withdraw_or_deposit(self.deposit),
             '4': self.change_password,
-            '5': lambda: user_accounts.dump_accounts_to_config()
         }
